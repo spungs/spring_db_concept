@@ -4,10 +4,13 @@ package com.care.db.basic.controller;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.care.db.basic.dto.MemberDTO;
@@ -42,8 +45,7 @@ public class MemberController {
 	}
 	
 	@PostMapping("register")
-	public String register(MemberDTO member, String confirm_Pw, 
-			Model model, RedirectAttributes ra) {
+	public String register(MemberDTO member, String confirm_Pw, Model model, RedirectAttributes ra) {
 		
 		String result = service.register(member, confirm_Pw);
 		//회원가입 실패 시
@@ -54,6 +56,16 @@ public class MemberController {
 		//회원가입 성공 시
 		ra.addFlashAttribute("msg", result);
 		return "redirect:index";
+	}
+	
+	@ResponseBody
+	@PostMapping(value="doubleCheck", produces="text/html; charset=UTF-8")
+	public String doubleCheck(@RequestBody String id) {
+//		System.out.println("id : "+id);
+		if(id == null || id.isEmpty()) {
+			return "입력후 확인해주세요.";
+		}
+		return service.doubleCheck(id);
 	}
 	
 	@GetMapping("list")

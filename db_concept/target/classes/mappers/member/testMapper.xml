@@ -5,9 +5,7 @@
 	<insert id="insert" parameterType="com.care.db.basic.dto.MemberDTO">
 		INSERT INTO db_basic VALUES(#{id},#{pw},#{name},#{email})
 	</insert>
-	<select id="selectId" 
-			parameterType="String" 
-			resultType="com.care.db.basic.dto.MemberDTO">
+	<select id="selectId" parameterType="String" resultType="com.care.db.basic.dto.MemberDTO">
 		SELECT * FROM db_basic WHERE id=#{id}
 	</select>
 	<select id="list" resultType="com.care.db.basic.dto.MemberDTO">
