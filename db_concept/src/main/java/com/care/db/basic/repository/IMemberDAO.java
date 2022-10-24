@@ -11,4 +11,5 @@ public interface IMemberDAO {
 	public ArrayList<MemberDTO> list();
 	public int update(MemberDTO member);
 	public int delete(String id);
+	public int doubleCheck(String id);
 }

@@ -13,6 +13,7 @@
 		req.onreadystatechange = changeText
 		req.open('post', 'doubleCheck')
 		var reqData = document.getElementById('id').value
+		console.log(reqData)
 		req.send(reqData)
 	}
 	
@@ -35,7 +36,7 @@
 		클라이언트 : doubleCheck 자바스크립트 함수에서 서버로 사용자가 입력한 아이디를 갖고 요청
 		서버 : doubleCheck 요청을 받아 doubleCheck 자바 메서드 호출
 		서버 : service 객체 내 doubleCheck 자바 메서드 호출
-		서버 : dao 객체 내 doubleCheck 자바 메서드 호출 (selectId 메서드로 대체함)
+		서버 : dao 객체 내 doubleCheck 자바 메서드 호출
 		서버 : tetstMapper.xml 파일에서 <select> 태그로 중복 확인 쿼리문 동작
 		서버 : 클라이언트 반환 데이터 "중복된 아이디" or "사용가능한 아이디";
 		클라이언트 : id="doubleCheckMsg" 태그에 출력.

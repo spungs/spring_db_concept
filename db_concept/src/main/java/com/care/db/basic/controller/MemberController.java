@@ -60,10 +60,9 @@ public class MemberController {
 	
 	@ResponseBody
 	@PostMapping(value="doubleCheck", produces="text/html; charset=UTF-8")
-	public String doubleCheck(@RequestBody String id) {
-//		System.out.println("id : "+id);
+	public String doubleCheck(@RequestBody(required = false) String id) {
 		if(id == null || id.isEmpty()) {
-			return "입력후 확인해주세요.";
+			return "입력후 체크해주세요.";
 		}
 		return service.doubleCheck(id);
 	}

@@ -128,9 +128,9 @@ public class MemberService {
 	}
 
 	public String doubleCheck(String id) {
-		if (memberDao.selectId(id) == null) {
-			return "사용가능한 아이디";
-		}
+		int count = memberDao.doubleCheck(id);
+		if(count == 0)
+			return "사용가능 아이디";
 		return "중복된 아이디";
 	}
 }

@@ -2,6 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.care.db.basic.repository.IMemberDAO">
+	<select id="doubleCheck" resultType="Integer" parameterType="String">
+		SELECT count(id) FROM db_basic WHERE id=#{id}
+	</select>
+	
 	<insert id="insert" parameterType="com.care.db.basic.dto.MemberDTO">
 		INSERT INTO db_basic VALUES(#{id},#{pw},#{name},#{email})
 	</insert>
