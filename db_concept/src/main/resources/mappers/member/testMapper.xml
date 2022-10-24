@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.care.db.basic.repository.IMemberDAO">
+	<insert id="insert" parameterType="com.care.db.basic.dto.MemberDTO">
+		INSERT INTO db_basic VALUES(#{id},#{pw},#{name},#{email})
+	</insert>
+	<select id="selectId" 
+			parameterType="String" 
+			resultType="com.care.db.basic.dto.MemberDTO">
+		SELECT * FROM db_basic WHERE id=#{id}
+	</select>
+	<select id="list" resultType="com.care.db.basic.dto.MemberDTO">
+		SELECT * FROM db_basic
+	</select>
+	<update id="update" parameterType="com.care.db.basic.dto.MemberDTO">
+		UPDATE db_basic SET pw=#{pw}, name=#{name}, email=#{email} WHERE id=#{id}
+	</update>
+	<delete id="delete" parameterType="String">
+		DELETE FROM db_basic WHERE id=#{id}
+	</delete>
+</mapper>
