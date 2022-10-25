@@ -81,7 +81,9 @@ public class MemberController {
 		if(email == null) {
 			return "이메일을 입력해주세요.";
 		}
+		// Math.random() : 0~1사이의 실수를 생성(대략 소숫점 16자리까지)
 		double n = Math.random();
+		// 생성된 랜덤 실수를 substring으로 2번째 인덱스부터 8번째 인덱스 전까지 추출해서 문자열로 형변환
 		String randomNum = Double.toString(n).substring(2,8);
 		// 인증번호는 사용자별 정보이기에 session에 꼭 저장해야함.
 		session.setAttribute("randomNum", randomNum);
