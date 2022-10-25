@@ -1,10 +1,11 @@
 package com.care.db.basic.controller;
 
 
+import java.util.HashMap;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.care.db.basic.dto.MemberDTO;
 import com.care.db.basic.repository.IMemberDAO;
+import com.care.db.basic.service.KakaoService;
+import com.care.db.basic.service.MailService;
 import com.care.db.basic.service.MemberService;
 
 @Controller
@@ -46,7 +49,10 @@ public class MemberController {
 	
 	@PostMapping("register")
 	public String register(MemberDTO member, String confirm_Pw, Model model, RedirectAttributes ra) {
-		
+		if(session.getAttribute("check")==null) {
+			model.addAttribute("msg", "인증 체크를 해주세요.");
+			return "member/register";
+		}
 		String result = service.register(member, confirm_Pw);
 		//회원가입 실패 시
 		if(result.equals("회원가입 성공") == false) {
@@ -55,6 +61,7 @@ public class MemberController {
 		}
 		//회원가입 성공 시
 		ra.addFlashAttribute("msg", result);
+		session.invalidate(); // 인증번호 제거를 위함
 		return "redirect:index";
 	}
 	
@@ -65,6 +72,39 @@ public class MemberController {
 			return "입력후 체크해주세요.";
 		}
 		return service.doubleCheck(id);
+	}
+	
+	@Autowired private MailService mailService;
+	@ResponseBody
+	@PostMapping(value="sendAuth", produces="text/html; charset=UTF-8")
+	public String sendAuth(@RequestBody(required = false) String email) {
+		if(email == null) {
+			return "이메일을 입력해주세요.";
+		}
+		double n = Math.random();
+		String randomNum = Double.toString(n).substring(2,8);
+		// 인증번호는 사용자별 정보이기에 session에 꼭 저장해야함.
+		session.setAttribute("randomNum", randomNum);
+		System.out.println("인증번호 : "+ randomNum);
+		mailService.sendMail(email, "[인증번호]", randomNum);
+		return "인증번호를 이메일로 전송했습니다.";
+	}
+	
+	@ResponseBody
+	@PostMapping(value="checkAuth", produces="text/html; charset=UTF-8")
+	public String checkAuth(@RequestBody(required = false) String authNumber) {
+		String randomNum = (String)session.getAttribute("randomNum");
+		
+		if(authNumber == null)
+			return "인증번호를 입력하세요 ";
+		else if(randomNum == null)
+			return "이메일을 입력 후 인증번호를 생성하세요.";
+		else if(authNumber.equals(randomNum)) {
+			session.setAttribute("check", "y"); // 인증 체크용 session
+			return "인증 성공";
+		}
+		else 
+			return "인증 실패";
 	}
 	
 	@GetMapping("list")
@@ -125,5 +165,20 @@ public class MemberController {
 		
 		ra.addFlashAttribute("msg", result);
 		return "redirect:index";
+	}
+	
+	@Autowired private KakaoService kakaoService;
+	@GetMapping("kakaoLogin")
+	public String kakaoLogin(String code) {
+		System.out.println("인가코드 : " + code);
+		String accessToken = kakaoService.getAccessToken(code);
+		HashMap<String, String> userInfo = kakaoService.getUserInfo(accessToken);
+		System.out.println("이메일 : " + userInfo.get("email"));
+		System.out.println("이름 : " + userInfo.get("nickname"));
+		
+		if(userInfo.isEmpty())
+			return "member/login";
+		
+		return "member/index";
 	}
 }

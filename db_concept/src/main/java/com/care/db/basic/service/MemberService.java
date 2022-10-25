@@ -1,5 +1,7 @@
 package com.care.db.basic.service;
 
+import java.util.Random;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +51,13 @@ public class MemberService {
 		 - salt(random 값)을 평문과 더해서 암호화 알고리즘에 적용 후 암호화 과정을 거쳐서 암호문을 생성함.
 		단방향 암호화 알고리즘이 동일하다면 길이는 동일하다.
 		ex) 암호화 알고리즘이 SHA-1 이라는 알고리즘이라면 길이는 모두 동일하다.
+		Random : salt
+		(암호문에서의 랜덤값을 만들고 암호화 알고리즘에 보내서 암호문을 만들기 때문에 똑같은 패스워드여도 다른 암호문이 생성됨)
 		
 		암호화 적용 전 패스워드  : 12341234
 		암호화된 패스워드 : $2a$10$h4EkVDg7F2.Zi1YALdp7aOKioO8XK376xcgHv3OW4bYHb1t5/hZ42
 		암호화된 패스워드 길이 : 60
 		
-		Random : salt
-		(암호문에서의 랜덤값을 만들고 암호화 알고리즘에 보내서 암호문을 만들기 때문에 똑같은 패스워드여도 다른 암호문이 생성됨)
 		암호화 적용 전 패스워드  : 1234
 		암호화된 패스워드 : $2a$10$DnkWt7kAq8DzVe0JjCy.GuvLkxioLmYCewXy.wfHOWiMTIqfAyIGK
 		암호화된 패스워드 길이 : 60
@@ -74,10 +76,13 @@ public class MemberService {
 			return "모두 입력해주세요.";
 		}
 		
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		
 		MemberDTO member = memberDao.selectId(id);
-		if (member == null || encoder.matches(pw, member.getPw()) == false) {
+		if (member == null) {
+			return "아이디 / 비밀번호를 다시 확인해주세요.";
+		}
+		
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		if (encoder.matches(pw, member.getPw()) == false) {
 			return "아이디 / 비밀번호를 다시 확인해주세요.";
 		}
 		
@@ -133,4 +138,5 @@ public class MemberService {
 			return "사용가능 아이디";
 		return "중복된 아이디";
 	}
+	
 }
