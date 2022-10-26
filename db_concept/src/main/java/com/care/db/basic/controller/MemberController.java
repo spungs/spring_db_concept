@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -130,16 +131,7 @@ public class MemberController {
 		return "redirect:index";
 	}
 	
-	@GetMapping("logout")
-	public String logout(RedirectAttributes ra) {
-		if(session.getAttribute("id") == null) {
-			ra.addFlashAttribute("msg","로그인 후 이용해주세요.");
-			return "redirect:index"; 
-		}
-		session.invalidate();
-		ra.addFlashAttribute("msg","로그아웃 완료");
-		return "redirect:index"; 
-	}
+	
 	
 	@PostMapping("update")
 	public String update(MemberDTO member, String confirm_Pw,
@@ -174,13 +166,26 @@ public class MemberController {
 	public String kakaoLogin(String code) {
 		System.out.println("인가코드 : " + code);
 		String accessToken = kakaoService.getAccessToken(code);
+		// session.setAttribute("accessToken", accessToken); // service에서 null 처리를 안해주면 session이 이 곳에 있어야지 로그아웃했을 때 unlink 시킬수 있음
 		HashMap<String, String> userInfo = kakaoService.getUserInfo(accessToken);
 		System.out.println("이메일 : " + userInfo.get("email"));
 		System.out.println("이름 : " + userInfo.get("nickname"));
+		
+		session.setAttribute("accessToken", accessToken);
 		
 		if(userInfo.isEmpty())
 			return "member/login";
 		
 		return "member/index";
+	}
+	
+	@RequestMapping("logout")
+	public String logout(Model model) {
+		String accessToken = (String)session.getAttribute("accessToken");
+		session.invalidate();
+		model.addAttribute("msg","로그아웃 완료");
+		if(accessToken != null)
+			kakaoService.unlink(accessToken);
+		return "member/logout"; 
 	}
 }

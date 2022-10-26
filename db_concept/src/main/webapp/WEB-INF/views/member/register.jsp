@@ -45,7 +45,30 @@
 			emailMsg.innerHTML = req.responseText
 		}
 	}
-	
+</script>
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+	function daumPost() {
+	    new daum.Postcode({
+	        oncomplete: function(data) {
+	            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+				// 예제를 참고하여 다양한 활용법을 확인해 보세요.
+	            
+	            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+	            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+	                addr = data.roadAddress;
+	            } else { // 사용자가 지번 주소를 선택했을 경우(J)
+	                addr = data.jibunAddress;
+	            }
+	            // 우편번호와 주소 정보를 해당 필드에 넣는다.
+	            document.getElementById('postcode').value = data.zonecode;
+	            document.getElementById("address").value = addr;
+	            // 커서를 상세주소 필드로 이동한다.
+	            document.getElementById("detailAddress").focus();
+	        }
+	    }).open();
+	}
 </script>
 </head>
 <body>
@@ -84,11 +107,16 @@
 		<input type="password" placeholder="비밀번호 확인 " name="confirm_Pw"><br>
 		<input type="text" placeholder="이름 " name="name"><br>
 		
-		<input type="text" placeholder="이메일 " name="email" id="email"><br>
+		<input type="text" placeholder="이메일 " name="email" id="email">
 		<input type="button" value="인증 번호 전송" onclick="sendAuth()"><br>
 		
 		<input type="text" name="authNumber" id="authNumber" placeholder="인증 번호">
 		<input type="button" value="인증 번호 확인" onclick="checkAuth()"><br>
+		
+		<input type="text" id="postcode" placeholder="우편번호" readonly="readonly">
+		<input type="button" onclick="daumPost()" value="우편번호 찾기"><br>
+		<input type="text" id="address" placeholder="주소" readonly="readonly"><br>
+		<input type="text" id="detailAddress" placeholder="상세주소"><br>
 		
 		<input type="submit" value="회원 가입">
 		<input type="button" onclick="location.href='index'" value="취소">

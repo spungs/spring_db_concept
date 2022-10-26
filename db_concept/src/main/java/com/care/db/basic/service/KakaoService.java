@@ -98,7 +98,13 @@ public class KakaoService {
 			JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
 			JsonObject profile = kakao_account.getAsJsonObject().get("profile").getAsJsonObject();
 			String nickname = profile.get("nickname").getAsString();
-			String email = kakao_account.get("email").getAsString();
+			
+			// 이메일 동의를 안했을 때 null을 처리해주기 위함
+			String email = "";
+			if(kakao_account.get("email") == null)
+				email = "null";
+			else
+				email = kakao_account.get("email").getAsString();
 
 			userInfo.put("nickname", nickname);
 			userInfo.put("email", email);
@@ -109,11 +115,12 @@ public class KakaoService {
 		return userInfo;
 	}
 
-	public void logout(String accessToken) {
-		String reqURL = "https://kapi.kakao.com/v1/user/logout";
+	public void unlink(String accessToken) {
+		String reqURL = "https://kapi.kakao.com/v1/user/unlink";
 
 		URL url;
 		try {
+			// URL 객체 생성
 			url = new URL(reqURL);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");
